@@ -8,21 +8,45 @@ use strictures 2;
 use DBIx::Class::Sims;
 DBIx::Class::Sims->set_sim_types({
   map { $_ => __PACKAGE__->can($_) } qw(
-    date time
+    date time datetime
   )
 });
 
-sub date {
-  my ($info, $runner) = @_;
+#use DateTime::Event::Random;
 
-  return 3;
+sub date {
+  my ($info, $sim_spec, $runner) = @_;
+
+  my $dt = DateTime->new(
+    year   => 2001,
+    month  => 2,
+    day    => 3,
+    hour   => 4,
+    minute => 5,
+    second => 6,
+  );
+  return $runner->datetime_parser->format_date($dt);
 }
 
 sub time {
-  my ($info, $runner) = @_;
+  my ($info, $sim_spec, $runner) = @_;
 
-  return 4;
+  my $dt = DateTime->new(
+    # The year/month/day aren't important because we're discarding them below.
+    year => 2001, month => 1, day => 1,
+    hour   => int(rand(24)), # 0 is acceptable. 24 is not
+    minute => int(rand(60)), # 0 is acceptable. 60 is not
+    second => int(rand(60)), # 0 is acceptable. 60 is not
+  );
+  return $runner->datetime_parser->format_time($dt);
 }
+
+#sub datetime {
+#  my ($info, $sim_spec, $runner) = @_;
+#
+#  my $dt = DateTime::Event::Random->datetime;
+#  return $runner->datetime_parser->format_datetime($dt);
+#}
 
 1;
 __END__

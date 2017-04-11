@@ -24,7 +24,7 @@ my $runner = DBIx::Class::Sims::Runner->new(
   reqs => undef,
 );
 
-my $value = $sub->({ type => 'time' }, $runner);
-is($value, 4);
+my $value = $sub->({ sim => { type => 'time' } }, { type => 'time' }, $runner);
+like($value, qr/(?:[01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]/, "$value is a legal time");
 
 done_testing;

@@ -24,7 +24,7 @@ my $runner = DBIx::Class::Sims::Runner->new(
   reqs => undef,
 );
 
-my $value = $sub->({ type => 'date' }, $runner);
-is($value, 3);
+my $value = $sub->({ sim => { type => 'date' } }, { type => 'date' }, $runner);
+is($value, '2001-02-03');
 
 done_testing;
