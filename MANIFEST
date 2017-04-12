@@ -20,3 +20,5 @@ META.json
 t/common.pm
 t/loader.pm
 t/date.t
+t/time.t
+t/timestamp.t

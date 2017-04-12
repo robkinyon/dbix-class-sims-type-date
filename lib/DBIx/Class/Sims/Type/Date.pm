@@ -8,17 +8,15 @@ use strictures 2;
 use DBIx::Class::Sims;
 DBIx::Class::Sims->set_sim_types({
   map { $_ => __PACKAGE__->can($_) } qw(
-    date time datetime
+    date time timestamp
   )
 });
 
 use DateTime::Event::Random;
 
-sub date {
-  my ($info, $sim_spec, $runner) = @_;
-
+sub default_span {
   # Include 1900-01-01T00:00:00 to just before 2100-01-01T00:00:00
-  my $default_span = DateTime::Span->new(
+  return DateTime::Span->new(
     start => DateTime->new(
       year => 1900, month => 1, day => 1,
     ),
@@ -26,8 +24,12 @@ sub date {
       year => 2100, month => 1, day => 1,
     ),
   );
+}
 
-  my $dt = DateTime::Event::Random->datetime(span => $default_span);
+sub date {
+  my ($info, $sim_spec, $runner) = @_;
+
+  my $dt = DateTime::Event::Random->datetime(span => default_span());
   return $runner->datetime_parser->format_date($dt);
 }
 
@@ -44,10 +46,10 @@ sub time {
   return $runner->datetime_parser->format_time($dt);
 }
 
-sub datetime {
+sub timestamp {
   my ($info, $sim_spec, $runner) = @_;
 
-  my $dt = DateTime::Event::Random->datetime;
+  my $dt = DateTime::Event::Random->datetime(span => default_span());
   return $runner->datetime_parser->format_datetime($dt);
 }
 
