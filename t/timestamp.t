@@ -24,8 +24,8 @@ my $runner = DBIx::Class::Sims::Runner->new(
   reqs => undef,
 );
 
-my $value = $sub->({ sim => { type => 'timestamp' } }, { type => 'timestamp' }, $runner);
-like($value, qr/^\d{4}-\d{2}-\d{2} (?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d$/);
+my $value = $sub->({}, { type => 'timestamp' }, $runner);
+like($value, qr/^\d{4}-\d{2}-\d{2} (?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d$/, "'$value' is a legal timestamp");
 
 done_testing;
 

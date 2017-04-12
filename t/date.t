@@ -24,7 +24,7 @@ my $runner = DBIx::Class::Sims::Runner->new(
   reqs => undef,
 );
 
-my $value = $sub->({ sim => { type => 'date' } }, { type => 'date' }, $runner);
-like($value, qr/^\d{4}-\d{2}-\d{2}$/);
+my $value = $sub->({}, { type => 'date' }, $runner);
+like($value, qr/^\d{4}-\d{2}-\d{2}$/, "'$value' is a legal date");
 
 done_testing;

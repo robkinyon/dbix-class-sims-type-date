@@ -36,13 +36,7 @@ sub date {
 sub time {
   my ($info, $sim_spec, $runner) = @_;
 
-  my $dt = DateTime->new(
-    # The year/month/day aren't important because we're discarding them below.
-    year => 2001, month => 1, day => 1,
-    hour   => int(rand(24)), # 0 is acceptable. 24 is not
-    minute => int(rand(60)), # 0 is acceptable. 60 is not
-    second => int(rand(60)), # 0 is acceptable. 60 is not
-  );
+  my $dt = DateTime::Event::Random->datetime(span => default_span());
   return $runner->datetime_parser->format_time($dt);
 }
 
