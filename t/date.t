@@ -25,6 +25,6 @@ my $runner = DBIx::Class::Sims::Runner->new(
 );
 
 my $value = $sub->({ sim => { type => 'date' } }, { type => 'date' }, $runner);
-is($value, '2001-02-03');
+like($value, qr/^\d{4}-\d{2}-\d{2}$/);
 
 done_testing;

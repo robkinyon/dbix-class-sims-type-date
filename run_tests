@@ -40,10 +40,14 @@ elif [[ "$1" == "test" ]]; then
     echo "Running tests against perl-${version}"
     MSYS_NO_PATHCONV=1 \
     docker run \
+      -it \
       --rm \
       -v "$(pwd)/lib:/app/lib" \
       -v "$(pwd)/t:/app/t" \
-      ${container}:${version} #prove -lvrs
+      -v "$(pwd)/local/${version}:/app/local" \
+      -v "$(pwd)/cpanfile:/app/cpanfile" \
+      -v "$(pwd)/cpanfile.snapshot.${version}:/app/cpanfile.snapshot.save" \
+        ${container}:${version} #prove -lvrs
   done
 elif [[ "$1" == "release" ]]; then
   shift

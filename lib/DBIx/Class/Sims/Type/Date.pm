@@ -12,19 +12,22 @@ DBIx::Class::Sims->set_sim_types({
   )
 });
 
-#use DateTime::Event::Random;
+use DateTime::Event::Random;
 
 sub date {
   my ($info, $sim_spec, $runner) = @_;
 
-  my $dt = DateTime->new(
-    year   => 2001,
-    month  => 2,
-    day    => 3,
-    hour   => 4,
-    minute => 5,
-    second => 6,
+  # Include 1900-01-01T00:00:00 to just before 2100-01-01T00:00:00
+  my $default_span = DateTime::Span->new(
+    start => DateTime->new(
+      year => 1900, month => 1, day => 1,
+    ),
+    before => DateTime->new(
+      year => 2100, month => 1, day => 1,
+    ),
   );
+
+  my $dt = DateTime::Event::Random->datetime(span => $default_span);
   return $runner->datetime_parser->format_date($dt);
 }
 
@@ -41,12 +44,12 @@ sub time {
   return $runner->datetime_parser->format_time($dt);
 }
 
-#sub datetime {
-#  my ($info, $sim_spec, $runner) = @_;
-#
-#  my $dt = DateTime::Event::Random->datetime;
-#  return $runner->datetime_parser->format_datetime($dt);
-#}
+sub datetime {
+  my ($info, $sim_spec, $runner) = @_;
+
+  my $dt = DateTime::Event::Random->datetime;
+  return $runner->datetime_parser->format_datetime($dt);
+}
 
 1;
 __END__

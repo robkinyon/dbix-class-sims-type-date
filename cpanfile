@@ -1,4 +1,5 @@
 requires 'DBIx::Class::Sims' => '0.300600';
+requires 'DateTime::Event::Random' => '0.000001';
 requires 'Data::Printer' => '0.36'; # np() isn't exported before 0.36+
 
 on test => sub {
