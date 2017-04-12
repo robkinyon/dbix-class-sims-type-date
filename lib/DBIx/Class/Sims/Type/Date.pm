@@ -71,24 +71,17 @@ The following sim types are pre-defined:
 
 =over 4
 
-=item * date
+=item * timestamp
 
-This generates a date correctly formatted for the RDBMS being used.
-
-=over 4
-
-=item * Foo
-
-=back
+This generates a timestamp correctly formatted for the RDBMS being used.
 
 =item * time
 
 This generates a time correctly formatted for the RDBMS being used.
 
-=item * us_address
+=item * date
 
-This generates a reasonable-looking US street address. The address will be one
-of these forms:
+This generates a date correctly formatted for the RDBMS being used.
 
 =head1 AUTHOR
 
