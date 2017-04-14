@@ -30,6 +30,11 @@ my %tests = (
     my ($value, $dt) = @_;
     cmp_ok($dt, '<', DateTime->now, "'$value' is in the past");
   },
+  timestamp_in_past_5_years => sub {
+    my ($value, $dt) = @_;
+    my $duration = DateTime->now - $dt;
+    cmp_ok($duration->years, '<=', 5, "'$value' is in the past 5 years");
+  },
 );
 
 while (my ($type, $addl) = each %tests) {
@@ -37,14 +42,17 @@ while (my ($type, $addl) = each %tests) {
     my $sub = DBIx::Class::Sims->sim_type($type);
 
     my $value = $sub->({}, { type => $type }, $runner);
-    my $dt = eval { $runner->datetime_parser->parse_datetime($value); };
-    if ($@) {
-      ok(0, "'$value' is NOT a legal timestamp: $@");
-      # Don't run $addl->() because $dt isn't legal, so other tests are worthless.
-    }
-    else {
-      ok(1, "'$value' is a legal timestamp");
-      $addl->($value, $dt);
+
+    foreach my $i ( 1 .. 1000 ) {
+      my $dt = eval { $runner->datetime_parser->parse_datetime($value); };
+      if ($@) {
+        ok(0, "'$value' is NOT a legal timestamp: $@");
+        # Don't run $addl->() because $dt isn't legal, so other tests won't pass.
+      }
+      else {
+        ok(1, "'$value' is a legal timestamp");
+        $addl->($value, $dt);
+      }
     }
   };
 }

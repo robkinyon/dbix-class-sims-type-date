@@ -13,6 +13,10 @@ DBIx::Class::Sims->set_sim_types({
   date_in_past => __PACKAGE__->can('date'),
   timestamp_in_past => __PACKAGE__->can('timestamp'),
 });
+DBIx::Class::Sims->set_sim_types([
+  [ date_in_past_N_years => qr/date_in_past_\d+_years/ => __PACKAGE__->can('date') ],
+  [ timestamp_in_past_N_years => qr/timestamp_in_past_\d+_years/ => __PACKAGE__->can('timestamp') ],
+]);
 
 use DateTime::Event::Random;
 
@@ -40,6 +44,13 @@ sub _date_ish {
   my $span;
   if ($sim_spec->{type} eq "${prefix}_in_past") {
     $span = create_span(before => DateTime->now);
+  }
+  elsif ($sim_spec->{type} =~ /^${prefix}_in_past_(\d+)_years$/) {
+    my $duration = DateTime::Duration->new(years => $1);
+    $span = create_span(
+      start => DateTime->now - $duration,
+      before => DateTime->now,
+    );
   }
   else {
      $span = create_span();
