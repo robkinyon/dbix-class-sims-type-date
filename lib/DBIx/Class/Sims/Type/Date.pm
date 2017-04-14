@@ -7,44 +7,54 @@ use strictures 2;
 
 use DBIx::Class::Sims;
 DBIx::Class::Sims->set_sim_types({
-  map { $_ => __PACKAGE__->can($_) } qw(
+  (map { $_ => __PACKAGE__->can($_) } qw(
     date time timestamp
-  )
+  )),
+  date_in_past => __PACKAGE__->can('date'),
+  timestamp_in_past => __PACKAGE__->can('timestamp'),
 });
 
 use DateTime::Event::Random;
 
-sub default_span {
-  # Include 1900-01-01T00:00:00 to just before 2100-01-01T00:00:00
-  return DateTime::Span->new(
-    start => DateTime->new(
-      year => 1900, month => 1, day => 1,
-    ),
-    before => DateTime->new(
-      year => 2100, month => 1, day => 1,
-    ),
-  );
-}
-
-sub date {
-  my ($info, $sim_spec, $runner) = @_;
-
-  my $dt = DateTime::Event::Random->datetime(span => default_span());
-  return $runner->datetime_parser->format_date($dt);
-}
-
 sub time {
   my ($info, $sim_spec, $runner) = @_;
 
-  my $dt = DateTime::Event::Random->datetime(span => default_span());
+  # We don't care about the date when generating a random time.
+  my $dt = DateTime::Event::Random->datetime;
   return $runner->datetime_parser->format_time($dt);
 }
 
-sub timestamp {
-  my ($info, $sim_spec, $runner) = @_;
+sub create_span {
+  # By default, include 1900-01-01T00:00:00 to just before 2100-01-01T00:00:00
+  my %opts = (
+    start  => DateTime->new(year => 1900, month => 1, day => 1),
+    before => DateTime->new(year => 2100, month => 1, day => 1),
+    @_,
+  );
+  return DateTime::Span->new(%opts);
+}
 
-  my $dt = DateTime::Event::Random->datetime(span => default_span());
-  return $runner->datetime_parser->format_datetime($dt);
+sub _date_ish {
+  my ($prefix, $formatter, $info, $sim_spec, $runner) = @_;
+
+  my $span;
+  if ($sim_spec->{type} eq "${prefix}_in_past") {
+    $span = create_span(before => DateTime->now);
+  }
+  else {
+     $span = create_span();
+  }
+
+  my $dt = DateTime::Event::Random->datetime(span => $span);
+  return $runner->datetime_parser->$formatter($dt);
+}
+
+sub date {
+  return _date_ish(date => format_date => @_);
+}
+
+sub timestamp {
+  return _date_ish(timestamp => format_datetime => @_);
 }
 
 1;
