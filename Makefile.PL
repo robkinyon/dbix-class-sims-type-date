@@ -15,9 +15,9 @@ resources 'bugtracker'  => 'http://rt.cpan.org/NoAuth/Bugs.html?Dist=DBIx-Class-
 perl_version '5.010_001';
 all_from 'lib/DBIx/Class/Sims/Type/Date.pm';
 
-requires 'DateTime::Event::Random';
-requires 'DBIx::Class::Sims' => '0.300700';
-requires 'Data::Printer' => '0.36'; # np() isn't exported before 0.36+
+requires 'DateTime::Event::Random' => '0.03';
+requires 'DBIx::Class::Sims'       => '0.300700';
+requires 'Data::Printer'           => '0.36'; # np() isn't exported before 0.36+
  
 test_requires 'File::Temp'        => '0.01';
 test_requires 'Test::DBIx::Class' => '0.01';

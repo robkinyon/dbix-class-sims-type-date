@@ -47,7 +47,7 @@ elif [[ "$1" == "test" ]]; then
       -v "$(pwd)/local/${version}:/app/local" \
       -v "$(pwd)/cpanfile:/app/cpanfile" \
       -v "$(pwd)/cpanfile.snapshot.${version}:/app/cpanfile.snapshot.save" \
-        ${container}:${version} #prove -lvrs t/time.t
+        ${container}:${version} #prove -lvrs t/date_timestamp.t
   done
 elif [[ "$1" == "release" ]]; then
   shift

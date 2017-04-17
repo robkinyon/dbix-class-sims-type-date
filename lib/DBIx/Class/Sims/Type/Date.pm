@@ -5,6 +5,8 @@ use 5.010_001;
 
 use strictures 2;
 
+our $VERSION = '0.000001';
+
 use DBIx::Class::Sims;
 DBIx::Class::Sims->set_sim_types({
   (map { $_ => __PACKAGE__->can($_) } qw(
@@ -46,24 +48,25 @@ sub _date_ish {
   my ($prefix, $formatter, $info, $sim_spec, $runner) = @_;
 
   my $now = DateTime->now;
+  my $one_day = DateTime::Duration->new(days => 1);
   my $span;
   if ($sim_spec->{type} eq "${prefix}_in_past") {
-    $span = create_span(before => $now);
+    $span = create_span(before => $now - $one_day);
   }
   elsif ($sim_spec->{type} eq "${prefix}_in_future") {
-    $span = create_span(after => $now);
+    $span = create_span(after => $now + $one_day);
   }
   elsif ($sim_spec->{type} =~ /^${prefix}_in_past_(\d+)_years$/) {
     my $duration = DateTime::Duration->new(years => $1);
     $span = create_span(
       after  => $now - $duration,
-      before => $now,
+      before => $now - $one_day,
     );
   }
   elsif ($sim_spec->{type} =~ /^${prefix}_in_next_(\d+)_years$/) {
     my $duration = DateTime::Duration->new(years => $1);
     $span = create_span(
-      after  => $now,
+      after  => $now + $one_day,
       before => $now + $duration,
     );
   }
@@ -126,6 +129,14 @@ This will create a date or timestamp after now and before 2100-01-01.
 
 This generates a date or timestamp correctly formatted for the RDBMS being used.
 This will create a date or timestamp in the next N years after now.
+
+=head2 ASSUMPTIONS
+
+=over 4
+
+=item * N will never be zero
+
+=back
 
 =head1 AUTHOR
 
