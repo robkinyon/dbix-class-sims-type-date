@@ -41,15 +41,16 @@ sub create_span {
 sub _date_ish {
   my ($prefix, $formatter, $info, $sim_spec, $runner) = @_;
 
+  my $now = DateTime->now;
   my $span;
   if ($sim_spec->{type} eq "${prefix}_in_past") {
-    $span = create_span(before => DateTime->now);
+    $span = create_span(before => $now);
   }
   elsif ($sim_spec->{type} =~ /^${prefix}_in_past_(\d+)_years$/) {
     my $duration = DateTime::Duration->new(years => $1);
     $span = create_span(
-      start => DateTime->now - $duration,
-      before => DateTime->now,
+      start => $now - $duration,
+      before => $now,
     );
   }
   else {
@@ -60,13 +61,10 @@ sub _date_ish {
   return $runner->datetime_parser->$formatter($dt);
 }
 
-sub date {
-  return _date_ish(date => format_date => @_);
-}
-
-sub timestamp {
-  return _date_ish(timestamp => format_datetime => @_);
-}
+# Dates and timestamps are handled identically, except for how the function used
+# to format them. So, do it that way.
+sub date      { return _date_ish(date      => format_date     => @_); }
+sub timestamp { return _date_ish(timestamp => format_datetime => @_); }
 
 1;
 __END__

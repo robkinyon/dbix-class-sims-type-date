@@ -8,21 +8,10 @@ BEGIN {
   build_schema();
 }
 
-use t::common qw(Schema);
+use t::common qw(test_dateish);
 
-use_ok 'DBIx::Class::Sims::Type::Date';
-
-my $sub = DBIx::Class::Sims::Type::Date->can('timestamp');
-
-my $runner = DBIx::Class::Sims::Runner->new(
-  parent => undef,
-  schema => Schema,
-  toposort => undef,
-  initial_spec => undef,
-  spec => undef,
-  hooks => undef,
-  reqs => undef,
-);
+use_ok 'DBIx::Class::Sims::Type::Date'
+  or BAIL_OUT 'Cannot load DBIx::Class::Sims::Type::Date';
 
 my %tests = (
   timestamp => sub {},
@@ -38,23 +27,7 @@ my %tests = (
 );
 
 while (my ($type, $addl) = each %tests) {
-  subtest $type => sub {
-    my $sub = DBIx::Class::Sims->sim_type($type);
-
-    my $value = $sub->({}, { type => $type }, $runner);
-
-    foreach my $i ( 1 .. 1000 ) {
-      my $dt = eval { $runner->datetime_parser->parse_datetime($value); };
-      if ($@) {
-        ok(0, "'$value' is NOT a legal timestamp: $@");
-        # Don't run $addl->() because $dt isn't legal, so other tests won't pass.
-      }
-      else {
-        ok(1, "'$value' is a legal timestamp");
-        $addl->($value, $dt);
-      }
-    }
-  };
+  test_dateish('timestamp', 'parse_datetime', $type, $addl);
 }
 
 done_testing;

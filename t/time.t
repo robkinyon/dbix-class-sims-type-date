@@ -8,23 +8,22 @@ BEGIN {
   build_schema();
 }
 
-use t::common qw(Schema);
+use t::common qw(runner);
 
-use_ok 'DBIx::Class::Sims::Type::Date';
+use_ok 'DBIx::Class::Sims::Type::Date'
+  or BAIL_OUT 'Cannot load DBIx::Class::Sims::Type::Date';
 
-my $sub = DBIx::Class::Sims::Type::Date->can('time');
+my $type = 'time';
 
-my $runner = DBIx::Class::Sims::Runner->new(
-  parent => undef,
-  schema => Schema,
-  toposort => undef,
-  initial_spec => undef,
-  spec => undef,
-  hooks => undef,
-  reqs => undef,
-);
+subtest $type => sub {
+  my $sub = DBIx::Class::Sims::Type::Date->can($type);
+  ok($sub, "Found the handler for $type") || return;
 
-my $value = $sub->({}, { type => 'time' }, $runner);
-like($value, qr/^(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d$/, "'$value' is a legal time");
+  my $runner = runner();
+  foreach my $i ( 1 .. 1000 ) {
+    my $value = $sub->({}, { type => $type }, $runner);
+    like($value, qr/^(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d$/, "'$value' is a legal time");
+  }
+};
 
 done_testing;

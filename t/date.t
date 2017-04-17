@@ -8,19 +8,10 @@ BEGIN {
   build_schema();
 }
 
-use t::common qw(Schema);
+use t::common qw(test_dateish);
 
-use_ok 'DBIx::Class::Sims::Type::Date';
-
-my $runner = DBIx::Class::Sims::Runner->new(
-  parent => undef,
-  schema => Schema,
-  toposort => undef,
-  initial_spec => undef,
-  spec => undef,
-  hooks => undef,
-  reqs => undef,
-);
+use_ok 'DBIx::Class::Sims::Type::Date'
+  or BAIL_OUT 'Cannot load DBIx::Class::Sims::Type::Date';
 
 my %tests = (
   date => sub {},
@@ -33,26 +24,14 @@ my %tests = (
     my $duration = DateTime->now - $dt;
     cmp_ok($duration->years, '<=', 5, "'$value' is in the past 5 years");
   },
+#  date_in_future => sub {
+#    my ($value, $dt) = @_;
+#    cmp_ok($dt, '>', DateTime->now, "'$value' is in the future");
+#  },
 );
 
 while (my ($type, $addl) = each %tests) {
-  subtest $type => sub {
-    my $sub = DBIx::Class::Sims->sim_type($type);
-
-    my $value = $sub->({}, { type => $type }, $runner);
-
-    foreach my $i ( 1 .. 1000 ) {
-      my $dt = eval { $runner->datetime_parser->parse_date($value); };
-      if ($@) {
-        ok(0, "'$value' is NOT a legal date: $@");
-        # Don't run $addl->() because $dt isn't legal, so other tests won't pass.
-      }
-      else {
-        ok(1, "'$value' is a legal date");
-        $addl->($value, $dt);
-      }
-    }
-  };
+  test_dateish('date', 'parse_date', $type, $addl);
 }
 
 done_testing;
