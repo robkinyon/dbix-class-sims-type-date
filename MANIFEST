@@ -19,6 +19,5 @@ META.yml
 META.json
 t/common.pm
 t/loader.pm
-t/date.t
+t/date_timestamp.t
 t/time.t
-t/timestamp.t

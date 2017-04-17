@@ -34,12 +34,14 @@ use Test::DBIx::Class;
 sub test_dateish {
   my ($name, $parser, $type, $addl) = @_;
 
+  my $num_to_run = $ENV{HARNESS_IS_VERBOSE} ? 1 : 1;
+
   subtest $type => sub {
     my $sub = DBIx::Class::Sims->sim_type($type);
     ok($sub, "Found the handler for $type") || return;
 
     my $runner = runner();
-    foreach my $i ( 1 .. 1000 ) {
+    foreach my $i ( 1 .. $num_to_run ) {
       my $value = $sub->({}, { type => $type }, $runner);
 
       my $dt = eval { $runner->datetime_parser->$parser($value); };
