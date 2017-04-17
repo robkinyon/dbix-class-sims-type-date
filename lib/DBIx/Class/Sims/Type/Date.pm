@@ -12,10 +12,14 @@ DBIx::Class::Sims->set_sim_types({
   )),
   date_in_past => __PACKAGE__->can('date'),
   timestamp_in_past => __PACKAGE__->can('timestamp'),
+  date_in_future => __PACKAGE__->can('date'),
+  timestamp_in_future => __PACKAGE__->can('timestamp'),
 });
 DBIx::Class::Sims->set_sim_types([
   [ date_in_past_N_years => qr/date_in_past_\d+_years/ => __PACKAGE__->can('date') ],
   [ timestamp_in_past_N_years => qr/timestamp_in_past_\d+_years/ => __PACKAGE__->can('timestamp') ],
+  [ date_in_next_N_years => qr/date_in_next_\d+_years/ => __PACKAGE__->can('date') ],
+  [ timestamp_in_next_N_years => qr/timestamp_in_next_\d+_years/ => __PACKAGE__->can('timestamp') ],
 ]);
 
 use DateTime::Event::Random;
@@ -29,9 +33,9 @@ sub time {
 }
 
 sub create_span {
-  # By default, include 1900-01-01T00:00:00 to just before 2100-01-01T00:00:00
+  # By default, just after 1900-01-01T00:00:00 to just before 2100-01-01T00:00:00
   my %opts = (
-    start  => DateTime->new(year => 1900, month => 1, day => 1),
+    after  => DateTime->new(year => 1900, month => 1, day => 1),
     before => DateTime->new(year => 2100, month => 1, day => 1),
     @_,
   );
@@ -46,11 +50,21 @@ sub _date_ish {
   if ($sim_spec->{type} eq "${prefix}_in_past") {
     $span = create_span(before => $now);
   }
+  elsif ($sim_spec->{type} eq "${prefix}_in_future") {
+    $span = create_span(after => $now);
+  }
   elsif ($sim_spec->{type} =~ /^${prefix}_in_past_(\d+)_years$/) {
     my $duration = DateTime::Duration->new(years => $1);
     $span = create_span(
-      start => $now - $duration,
+      after  => $now - $duration,
       before => $now,
+    );
+  }
+  elsif ($sim_spec->{type} =~ /^${prefix}_in_next_(\d+)_years$/) {
+    my $duration = DateTime::Duration->new(years => $1);
+    $span = create_span(
+      after  => $now,
+      before => $now + $duration,
     );
   }
   else {
@@ -84,17 +98,34 @@ The following sim types are pre-defined:
 
 =over 4
 
-=item * timestamp
-
-This generates a timestamp correctly formatted for the RDBMS being used.
-
 =item * time
 
 This generates a time correctly formatted for the RDBMS being used.
 
-=item * date
+=item * date / timestamp
 
-This generates a date correctly formatted for the RDBMS being used.
+This generates a date or timestamp correctly formatted for the RDBMS being used.
+By default, the date or timestamp will be after 1900-01-01 and before 2100-01-01.
+
+=item * date_in_past / timestamp_in_past
+
+This generates a date or timestamp correctly formatted for the RDBMS being used.
+This will create a date or timestamp after 1900-01-01 and before now.
+
+=item * date_in_past_N_years / timestamp_in_past_N_years
+
+This generates a date or timestamp correctly formatted for the RDBMS being used.
+This will create a date or timestamp in the previous N years before now.
+
+=item * date_in_future / timestamp_in_future
+
+This generates a date or timestamp correctly formatted for the RDBMS being used.
+This will create a date or timestamp after now and before 2100-01-01.
+
+=item * date_in_next_N_years / timestamp_in_next_N_years
+
+This generates a date or timestamp correctly formatted for the RDBMS being used.
+This will create a date or timestamp in the next N years after now.
 
 =head1 AUTHOR
 

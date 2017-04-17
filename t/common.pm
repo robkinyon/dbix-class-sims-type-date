@@ -34,7 +34,7 @@ use Test::DBIx::Class;
 sub test_dateish {
   my ($name, $parser, $type, $addl) = @_;
 
-  my $num_to_run = $ENV{HARNESS_IS_VERBOSE} ? 1 : 1;
+  my $num_to_run = $ENV{HARNESS_IS_VERBOSE} ? 1 : 1000;
 
   subtest $type => sub {
     my $sub = DBIx::Class::Sims->sim_type($type);

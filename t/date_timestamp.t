@@ -28,12 +28,19 @@ while (my ($name, $parser) = each %types) {
     "${name}_in_past_5_years" => sub {
       my ($value, $dt) = @_;
       my $duration = DateTime->now - $dt;
-      cmp_ok($duration->years, '<=', 5, "'$value' is in the past 5 years");
+      cmp_ok($duration->years, '<', 5, "'$value' is within 5 years");
+      ok($duration->is_positive, "'$value' is in the past");
     },
-  #  "${name}_in_future" => sub {
-  #    my ($value, $dt) = @_;
-  #    cmp_ok($dt, '>', DateTime->now, "'$value' is in the future");
-  #  },
+    "${name}_in_future" => sub {
+      my ($value, $dt) = @_;
+      cmp_ok($dt, '>', DateTime->now, "'$value' is in the future");
+    },
+    "${name}_in_next_5_years" => sub {
+      my ($value, $dt) = @_;
+      my $duration = DateTime->now - $dt;
+      cmp_ok($duration->years, '<', 5, "'$value' is within 5 years");
+      ok($duration->is_negative, "'$value' is in the future");
+    },
   );
 
   while (my ($type, $addl) = each %tests) {
