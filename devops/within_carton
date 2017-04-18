@@ -7,15 +7,6 @@ if [[ $1 == "bash" ]]; then
   exit
 fi
 
-# Only run carton install if local/ doesn't exist or the cpanfile has changed.
-if [[ -s /app/cpanfile.snapshot.save ]]; then
-  cp --preserve=timestamps /app/cpanfile.snapshot.save /app/cpanfile.snapshot
-fi
-if [[ (! -d /app/local) || (/app/cpanfile -nt /app/cpanfile.snapshot) ]]; then
-  carton install
-  cp --preserve=timestamps /app/cpanfile.snapshot /app/cpanfile.snapshot.save
-fi
-
 echo "Starting tests"
 if [[ $1 == "cover" ]]; then
   shift

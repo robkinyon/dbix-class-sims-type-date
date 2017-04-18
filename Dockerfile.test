@@ -13,7 +13,7 @@ COPY "devops/within_carton" "/usr/local/bin/within_carton"
 RUN chmod +x /usr/local/bin/within_carton
 COPY "cpanfile" "/app/cpanfile"
 
-#RUN carton install
+RUN carton install
 
 ENTRYPOINT [ "/usr/local/bin/within_carton" ]
 CMD [ "prove", "-lrs" ]

@@ -2,9 +2,9 @@
 
 set -e
 
-me="${BASH_SOURCE[0]}"
-mydir=$(cd $(dirname $me) && pwd)
-cd $mydir
+ME="${BASH_SOURCE[0]}"
+MYDIR=$(cd $(dirname $ME) && pwd)
+cd $MYDIR
 
 container="robkinyon/dbix-class-sims-type-date-test"
 # Broken: 5.12
@@ -40,13 +40,9 @@ elif [[ "$1" == "test" ]]; then
     echo "Running tests against perl-${version}"
     MSYS_NO_PATHCONV=1 \
     docker run \
-      -it \
       --rm \
       -v "$(pwd)/lib:/app/lib" \
       -v "$(pwd)/t:/app/t" \
-      -v "$(pwd)/local/${version}:/app/local" \
-      -v "$(pwd)/cpanfile:/app/cpanfile" \
-      -v "$(pwd)/cpanfile.snapshot.${version}:/app/cpanfile.snapshot.save" \
         ${container}:${version} #prove -lvrs t/date_timestamp.t
   done
 elif [[ "$1" == "release" ]]; then
@@ -61,9 +57,9 @@ elif [[ "$1" == "release" ]]; then
   # copy the .pause here out of $HOME.
   cp ~/.pause .
 
-  tag=5.22
+  tag=5.24
   if [[ -z $(docker images -q ${container}:${tag}) ]]; then
-    $me build ${tag}
+    $ME build ${tag}
   fi
 
   files_dirs_to_map=(
@@ -71,7 +67,6 @@ elif [[ "$1" == "release" ]]; then
     Changes LICENSE
     Makefile.PL inc
     MANIFEST MANIFEST.SKIP
-    MYMETA.json MYMETA.yml
   )
 
   volumes=(-v $(pwd)/.pause:/root/.pause)
@@ -86,6 +81,6 @@ elif [[ "$1" == "release" ]]; then
     ${container}:${tag} \
       -c "carton exec perl Makefile.PL && make dist && cpan-upload *.tar.gz"
 else
-  >&2 echo "${me}: <pull | build | test | release> [version, ...]"
+  >&2 echo "${ME}: <pull | build | test | release> [version, ...]"
   exit 1
 fi
